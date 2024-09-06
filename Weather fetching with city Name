@@ -1,0 +1,36 @@
+import requests
+
+def getting_weather(city):
+    api_key = "Enter your API KEY here "
+    url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+    response = requests.get(url)
+    weather_data = response.json()
+    
+    if weather_data["cod"] == 200:
+        location = weather_data["name"]
+        longitude = weather_data["coord"]["lon"]
+        latitude = weather_data["coord"]["lat"]
+        description = weather_data["weather"][0]["main"]
+        temp = weather_data["main"]["temp"]
+        fell_like = weather_data["main"]["feels_like"]
+        pressure = weather_data["main"]["pressure"]
+        humidity = weather_data["main"]["humidity"]
+        wind_speed = weather_data["wind"]["speed"]
+        country = weather_data["sys"]["country"]
+
+        return location,longitude,latitude,description,temp,fell_like,pressure,humidity,wind_speed,country
+
+    else:
+         raise Exception
+        
+
+def main():
+    try:
+        city = input("Enter your city Name: ")
+        location,longitude,latitude,description,temp,fell_like,pressure,humidity,wind_speed,country = getting_weather(city)
+        print(f"Location: {location}\nLongitude: {longitude}\nLatitude: {latitude}\nDescription: {description}\nTemprature: {temp} °C\nfells Like: {fell_like} °C\nPressure: {pressure}\nHumidity: {humidity}\nWind Speed: {wind_speed}\nCountry: {country}")
+    except Exception as e:
+        print(str(e))
+
+if __name__ == "__main__":
+    main()
