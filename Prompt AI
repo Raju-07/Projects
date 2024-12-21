@@ -1,0 +1,136 @@
+#Prompt AI
+import os
+import google.generativeai as genai
+from customtkinter import *
+from PIL import Image,ImageTk
+
+# image insertion in GUI.           Download all the required icons for window
+file_path=os.path.dirname(os.path.realpath(__file__))
+send_button_icon=CTkImage(Image.open(file_path +  "/send1.png"),size=(45,45))
+history_icon=CTkImage(Image.open(file_path +  "/historyicon.png"),size=(20,20))
+ai_icon=CTkImage(Image.open(file_path + "/ai icon.png"),size=(95,95))
+
+set_appearance_mode("dark")
+set_default_color_theme("blue")
+#Geometry setup 
+app=CTk()
+app.geometry("850x678")
+app.title("Promt AI")
+app.resizable(FALSE,FALSE)
+# app.iconbitmap(f"{send_button_icon}")
+
+hdr_label=CTkLabel(master=app,
+                   text="Promt A.I.",
+                   text_color="White",
+                   compound=CENTER,
+                   font=("Georgia",45,"bold"))
+hdr_label.pack(pady=10)
+
+hstry_frame=CTkFrame(master=app,
+                     height=550,
+                     width=150,
+                     fg_color="#68868D",
+                     border_color="gray",
+                     border_width=2,
+                     corner_radius=9)
+hstry_frame.pack(side=LEFT,padx=16)
+
+hst_hdr=CTkLabel(master=hstry_frame,
+                 text="History",
+                 text_color="yellow",
+                 anchor=CENTER,
+                 font=("Georgia",22)
+                 )
+hst_hdr.place(rely=0.03,relx=0.1)
+
+hst_hdr=CTkLabel(master=hstry_frame,
+                 image=history_icon,
+                 anchor=CENTER,
+                 text=" "
+                 )
+hst_hdr.place(rely=0.03,relx=0.8)
+
+prompt_frame=CTkFrame(master=app,
+                     height=550,
+                     width=700,
+                     fg_color="#273141",
+                     border_color="grey",
+                     border_width=2,
+                     corner_radius=9)
+prompt_frame.pack(side=RIGHT,padx=20)
+
+
+prompt_frame_hdr_label=CTkLabel(master=prompt_frame,
+                               text="Welcome to Prompt A.I.",
+                               text_color="#75CA11",
+                               compound=CENTER,
+                               font=("Georgia",30))
+prompt_frame_hdr_label.place(relx=0.1,rely=0.1)
+promt_frame_hdr_icon=CTkLabel(master=prompt_frame,
+                              text=" ",
+                              image=ai_icon
+                              )
+promt_frame_hdr_icon.place(relx=0.72,rely=0.01)
+
+reply_textbox=CTkTextbox(master=prompt_frame,
+                         height=350,
+                         width=550,
+                         fg_color="transparent",
+                         border_color="white",
+                         border_width=2,
+                         corner_radius=8,
+                         text_color="white",
+                         font=("Georgia",17),
+                         wrap="word",
+                         state = 'disabled')
+reply_textbox.place(relx=0.5,rely=0.52,anchor=CENTER)
+
+# Function for inserting Prompts from right-side
+reply_textbox.tag_config("right",justify='right')
+def insert_right(message):
+    reply_textbox.insert('end',message+"\n\n","right")
+
+#Integrating Google Gemini model
+def generate_answer(event=None):
+    reply_textbox.configure(state="normal")
+    insert_right(Quary_box.get())
+    prompt = Quary_box.get()
+    Quary_box.delete(0,END)
+
+    if prompt == '':
+        pass
+    else:
+        genai.configure(api_key="Enter Your API Key Here")     #👈👈 Enter you API Key here
+        model = genai.GenerativeModel("models/gemini-1.5-flash")
+        response = model.generate_content(f"{prompt}")
+        reply_textbox.insert('end',response.text+'\n')
+        reply_textbox.configure(state='disabled')
+
+send_button=CTkButton(master=prompt_frame,
+                      width=30,
+                      height=30,
+                      text=" ",
+                      fg_color="transparent",
+                      image=send_button_icon,
+                      hover=LEFT,
+                      corner_radius=15,
+                      command=generate_answer)
+send_button.place(relx=0.81,rely=0.86)
+
+Quary_box=CTkEntry(master=prompt_frame,
+                   text_color="white",
+                   font=("Arial",20),
+                   fg_color="transparent",
+                   placeholder_text_color="white",
+                   width=400,
+                   height=50,
+                   placeholder_text="Enter Your Prompt",
+                   border_width=2,
+                   border_color="yellow",
+                   corner_radius=20)
+Quary_box.place(relx=0.46,rely=0.95,anchor=S)
+
+# Binding Enter button to generate the response
+Quary_box.bind('<Return>',generate_answer)
+#Packing Main window
+app.mainloop()
